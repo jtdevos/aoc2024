@@ -40,15 +40,39 @@ def count_passing_reports(filepath):
   reports  = read_nums(filepath)
   passcount = 0
   for rpt in reports:
-    incOrDec = all_increasing(rpt) or all_decreasing(rpt)
-    grad = all_gradual(rpt, 1, 3)
-    print(f'rpt:{rpt}\t inc:{all_increasing(rpt)}\t dec:{all_decreasing(rpt)}\t incOrDec:{incOrDec}\t grad:{grad}')
-    if incOrDec and grad:
+    safe = is_safe(rpt)
+    if is_safe(rpt):
       passcount += 1  
 
   print(f'passcount for {filepath}: {passcount}')
   return passcount
 
+def count_dampener_passing_reports(filepath):
+  reports  = read_nums(filepath)
+  passcount = 0
+  for rpt in reports:
+    if is_dampener_safe(rpt):
+      passcount += 1  
+  print(f'passcount for {filepath}: {passcount}')
+  return passcount
+
+def is_safe(rpt):
+  incOrDec = all_increasing(rpt) or all_decreasing(rpt)
+  grad = all_gradual(rpt, 1, 3)
+  print(f'rpt:{rpt}\t inc:{all_increasing(rpt)}\t dec:{all_decreasing(rpt)}\t incOrDec:{incOrDec}\t grad:{grad}')
+  return incOrDec and grad
+
+def is_dampener_safe(rpt):
+  if is_safe(rpt):
+    return True
+  safe = False
+  for i in range(len(rpt)):
+    subrpt = rpt[:]
+    del subrpt[i]
+    if is_safe(subrpt):
+      safe = True
+      break
+  return safe
 
 
 
@@ -62,5 +86,8 @@ def main():
 
   pcsample = count_passing_reports('resources/sample.txt')
   pcinput = count_passing_reports('resources/input.txt')
+
+  pcsample = count_dampener_passing_reports('resources/sample.txt')
+  pcinput = count_dampener_passing_reports('resources/input.txt')
 if __name__ == "__main__":
   main()
