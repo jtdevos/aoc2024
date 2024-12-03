@@ -1,0 +1,3 @@
+mul(1,2)
+mul(2,4)mul(1234,2)flomul(4,2)
+mul(1,a)
