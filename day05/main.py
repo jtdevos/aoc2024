@@ -33,8 +33,7 @@ def parse_sections(path):
   sections = [s0, s1]
   return sections
 
-
-def is_valid_pageorder(rule, pageorder):
+def process_rule(rule, pageorder):
   lpage, rpage = rule
   lpageIdx = -1
   rpageIdx = -1
@@ -47,17 +46,24 @@ def is_valid_pageorder(rule, pageorder):
       rpageIdx = idx
     if rpageIdx>-1 and lpageIdx>-1:
       break
+  return lpageIdx, rpageIdx
+
+def is_valid_pageorder(rule, pageorder):
+  lpage, rpage = rule
+  lpageIdx, rpageIdx = process_rule(rule, pageorder)
   is_valid = not(lpageIdx > -1 and rpageIdx > -1 and lpageIdx > rpageIdx)
   return is_valid
 
 def check_rules(rules, pageOrderings):
   validUpdates = []
+  invalidUpdates = []
   for pageOrdering in pageOrderings:
     if any(not is_valid_pageorder(rule, pageOrdering) for rule in rules):
-      print(f'page order not valid: {pageOrdering}')
+      # print(f'page order not valid: {pageOrdering}')
+      invalidUpdates.append(pageOrdering)
     else:
       validUpdates.append(pageOrdering)
-  return validUpdates
+  return validUpdates, invalidUpdates
 
 
 def part1(path):
@@ -66,7 +72,7 @@ def part1(path):
   for s in line_sections:
     print(f'section: {s}')
 
-  validUpdates = check_rules(rules, pageOrderings)
+  validUpdates, ignored = check_rules(rules, pageOrderings)
   print(f'valid updates: {validUpdates}')
   total = 0
   for update in validUpdates:
@@ -76,12 +82,51 @@ def part1(path):
     print(f'middle index: {update[idx]}')
   print(f'total of middles: {total}')
 
+def part2(path):
+  line_sections = parse_sections(path)
+  rules, pageUpdates = line_sections
+  ignored, invalidUpdates = check_rules(rules, pageUpdates)
+  assert(len(pageUpdates) == len(ignored) + len(invalidUpdates))
+  fixedUpdates = []
+  for update in invalidUpdates:
+    print(f'invalid update: {update}')
+    # now get all the violating rules for this update
+    brokenrules = [rule for rule in rules if not is_valid_pageorder(rule, update)]
+    fixedupdate = update[:]
+    for br in brokenrules:
+      # fixing one broken rule might implicitly fix others, recheck 
+      if  is_valid_pageorder(br, fixedupdate):
+        print(f'rule {br} no longer broken by {fixedupdate}')
+      else:
+        print(f'broken rule: {br}, orig update:{fixedupdate}')
+        lpage, rpage = br
+        lidx, ridx = process_rule(br, fixedupdate)
+        page = fixedupdate.pop(ridx)
+        assert(rpage == page)
+        print(f'   removed {page}: new update:{fixedupdate}')
+        fixedupdate.insert(lidx, rpage)
+        print(f'   current update: {fixedupdate}')
+    print(f'update:{update} becomes {fixedupdate}')
+    fixedUpdates.append(fixedupdate)
+  total = 0
+  assert(len(fixedUpdates) == len(invalidUpdates))
+  for update in fixedUpdates:
+    idx = int((len(update)-1)/2)
+    midnum = update[idx]
+    total += midnum
+    print(f'midnum of {update} is {midnum}')
+  print(f'total of midnums is: {total}')
+      
+
+
 
 
 
 def main():
     # part1('resources/sample.txt')
-    part1('resources/input.txt')
+    # part1('resources/input.txt')
+    # part2('resources/sample.txt')
+    part2('resources/input.txt')
 
 if __name__ == "__main__":
    main()
