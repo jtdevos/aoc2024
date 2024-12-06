@@ -23,7 +23,7 @@ def read_line_sections(path, delim=os.linesep):
   # don't forget to tack on the last line
   sections.append(section)
   return sections
-          
+
 def parse_sections(path):
   """convert sections of lines into lists of numbers. return the 2 parsed sections"""
   sections = read_line_sections(path)
@@ -50,39 +50,38 @@ def is_valid_pageorder(rule, pageorder):
   is_valid = not(lpageIdx > -1 and rpageIdx > -1 and lpageIdx > rpageIdx)
   return is_valid
 
-
-
 def check_rules(rules, pageOrderings):
   validUpdates = []
   for pageOrdering in pageOrderings:
     if any(not is_valid_pageorder(rule, pageOrdering) for rule in rules):
       print(f'page order not valid: {pageOrdering}')
-    else: 
+    else:
       validUpdates.append(pageOrdering)
   return validUpdates
-    
-
-    # for rule in rules:    
-    #   if is_valid_pageorder(rule, pageOrdering):
-    #     print(f'rule {rule} is valid for: {pageOrdering}')
-    
-
-         
 
 
-def main():
-  print(f'hello from main')
-  line_sections = parse_sections('resources/sample.txt');
+def part1(path):
+  line_sections = parse_sections(path);
   rules, pageOrderings = line_sections
   for s in line_sections:
     print(f'section: {s}')
 
   validUpdates = check_rules(rules, pageOrderings)
   print(f'valid updates: {validUpdates}')
+  total = 0
   for update in validUpdates:
     idx = int((len(update)-1)/2)
+    midnum = update[idx]
+    total += midnum
     print(f'middle index: {update[idx]}')
+  print(f'total of middles: {total}')
 
+
+
+
+def main():
+    # part1('resources/sample.txt')
+    part1('resources/input.txt')
 
 if __name__ == "__main__":
    main()
