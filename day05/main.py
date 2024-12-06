@@ -124,7 +124,7 @@ def part2(path):
 
 def main():
     # part1('resources/sample.txt')
-    # part1('resources/input.txt')
+    part1('resources/input.txt')
     # part2('resources/sample.txt')
     part2('resources/input.txt')
 
